@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Video to ASCII Converter</title>
     <style>
-        /* Gaya desain yang bersih, minimalis, dengan palet biru dan hijau lembut */
+        /* Gaya dasar (Desktop) */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f0f8f8;
@@ -24,6 +24,7 @@
         p {
             color: #3aafa9;
             margin-bottom: 30px;
+            text-align: center;
         }
         .upload-btn {
             background-color: #3aafa9;
@@ -43,15 +44,21 @@
         input[type="file"] {
             display: none;
         }
+        
+        /* Kontainer ASCII */
         #ascii-container {
             background-color: #ffffff;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
             margin-top: 20px;
-            overflow-x: auto;
+            
+            /* Penting: Memungkinkan scroll horizontal jika gambar lebih lebar dari layar */
             max-width: 100%;
+            overflow-x: auto; 
+            box-sizing: border-box;
         }
+        
         pre {
             font-family: monospace;
             font-size: 7px;
@@ -59,10 +66,36 @@
             letter-spacing: 2px;
             color: #17252a;
             margin: 0;
+            /* Penting: Mencegah teks turun ke baris baru yang bisa merusak gambar */
+            white-space: pre; 
         }
-        /* Elemen ini disembunyikan karena hanya dipakai untuk pemrosesan di balik layar */
+
         canvas, video {
             display: none; 
+        }
+
+        /* Tweak Responsif Khusus HP (Layar di bawah 768px) */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            h2 {
+                font-size: 22px;
+            }
+            .upload-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            #ascii-container {
+                padding: 10px;
+                width: 95vw; /* Menggunakan 95% lebar layar HP */
+            }
+            pre {
+                /* Font diperkecil drastis agar lebih muat di layar HP */
+                font-size: 4px; 
+                line-height: 4px;
+                letter-spacing: 1px;
+            }
         }
     </style>
 </head>
@@ -80,7 +113,7 @@
         <pre id="ascii-output">Silakan unggah video untuk memulai...</pre>
     </div>
 
-    <video id="videoElement" controls muted playsinline></video>
+    <video id="videoElement" controls muted playsinline loop></video>
     <canvas id="canvasElement"></canvas>
 
     <script>
@@ -90,29 +123,28 @@
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const asciiOutput = document.getElementById('ascii-output');
 
-        // Karakter ASCII (Bisa dibalik untuk background putih)
         const density = " .:-=+*#%@";
-        const asciiWidth = 100; // Sedikit dikurangi agar lebih ringan diproses browser
-
+        
         videoInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
                 const fileURL = URL.createObjectURL(file);
                 video.src = fileURL;
-                asciiOutput.innerText = "Sedang menyiapkan video... (Mohon tunggu sebentar)";
+                asciiOutput.innerText = "Sedang menyiapkan video...";
                 
-                // Hanya putar jika video sudah benar-benar siap
                 video.oncanplay = function() {
                     video.play().catch(function(error) {
-                        // Jika diblokir oleh browser, munculkan pesan error ini
-                        asciiOutput.innerText = "Gagal memutar video. Error: " + error.message;
-                        console.error("Autoplay dicegah oleh browser:", error);
+                        asciiOutput.innerText = "Gagal memutar video: " + error.message;
                     });
                 };
             }
         });
 
         video.addEventListener('play', function() {
+            // Dinamis mengatur lebar resolusi ASCII berdasarkan ukuran layar
+            // Jika buka di HP, detailnya diturunkan sedikit (70) agar lebih ringan dan muat
+            const asciiWidth = window.innerWidth < 768 ? 70 : 100; 
+            
             const ratio = video.videoHeight / video.videoWidth;
             canvas.width = asciiWidth;
             canvas.height = parseInt(asciiWidth * ratio * 0.5); 
@@ -133,7 +165,6 @@
                     const brightness = (r + g + b) / 3;
                     const charIndex = Math.floor(brightness / 255 * (density.length - 1));
                     const char = density[charIndex] === " " ? "&nbsp;" : density[charIndex];
-                    
                     asciiImage += char;
 
                     if ((i / 4 + 1) % canvas.width === 0) {
