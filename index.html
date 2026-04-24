@@ -106,16 +106,22 @@
 </head>
 <body>
 
-    <h2>ASCII Video Player</h2>
-    <p>Unggah video untuk melihat konversi secara real-time</p>
+    <h2>KICAU MANIAA YANG VIRAL</h2>
+    <p>Unggah video Latar belakang Putih Agar Optimal Yaa</p>
 
-    <label class="upload-btn">
-        Pilih File Video
-        <input type="file" id="videoInput" accept="video/*">
-    </label>
+    <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+        <label class="upload-btn">
+            Pilih File Video Cuyy
+            <input type="file" id="videoInput" accept="video/*">
+        </label>
+        
+        <button id="muteBtn" class="upload-btn" style="display: none; background-color: #e74c3c;">
+            🔊 Buka Suara
+        </button>
+    </div>
 
     <div id="ascii-container">
-        <pre id="ascii-output">Silakan unggah video untuk memulai...</pre>
+        <pre id="ascii-output">DEVELOPER DWI WOII</pre>
     </div>
 
     <video id="videoElement" controls muted playsinline loop></video>
@@ -127,6 +133,7 @@
         const canvas = document.getElementById('canvasElement');
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const asciiOutput = document.getElementById('ascii-output');
+        const muteBtn = document.getElementById('muteBtn');
 
         const density = " .:-=+*#%@";
         
@@ -135,6 +142,9 @@
             if (file) {
                 const fileURL = URL.createObjectURL(file);
                 video.src = fileURL;
+                muteBtn.style.display = 'inline-block';
+                muteBtn.innerHTML = '🔊 Buka Suara';
+                muteBtn.style.backgroundColor = '#e74c3c';
                 asciiOutput.innerText = "Sedang menyiapkan video...";
                 
                 video.oncanplay = function() {
@@ -144,7 +154,18 @@
                 };
             }
         });
-
+        // Fungsi untuk menghidupkan/mematikan suara
+        muteBtn.addEventListener('click', function() {
+            if (video.muted) {
+                video.muted = false; // Suara nyala
+                muteBtn.innerHTML = '🔇 Matikan Suara';
+                muteBtn.style.backgroundColor = '#7f8c8d'; // Berubah abu-abu
+            } else {
+                video.muted = true; // Suara mati
+                muteBtn.innerHTML = '🔊 Buka Suara';
+                muteBtn.style.backgroundColor = '#e74c3c'; // Berubah merah lagi
+            }
+        });
         video.addEventListener('play', function() {
             // Dinamis mengatur lebar resolusi ASCII berdasarkan ukuran layar
             // Jika buka di HP, detailnya diturunkan sedikit (70) agar lebih ringan dan muat
