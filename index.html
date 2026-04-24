@@ -90,8 +90,8 @@
         const ctx = canvas.getContext('2d', { willReadFrequently: true });
         const asciiOutput = document.getElementById('ascii-output');
 
-        // Karakter ASCII dari gelap ke terang
-        const density = " .:-=+*#%@";
+        // Karakter ASCII dari terang ke gelap
+        const density = "@%#*+=-:. ";
         
         // Lebar karakter ASCII (semakin kecil semakin detail tapi berat diproses)
         const asciiWidth = 120; 
