@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video to ASCII Converter</title>
+    <style>
+        /* Gaya desain yang bersih, minimalis, dengan palet biru dan hijau lembut */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f8f8;
+            color: #2c3e50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            margin: 0;
+        }
+        h2 {
+            color: #2b7a78;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        p {
+            color: #3aafa9;
+            margin-bottom: 30px;
+        }
+        .upload-btn {
+            background-color: #3aafa9;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .upload-btn:hover {
+            background-color: #2b7a78;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        #ascii-container {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            margin-top: 20px;
+            overflow-x: auto;
+            max-width: 100%;
+        }
+        pre {
+            font-family: monospace;
+            font-size: 7px;
+            line-height: 7px;
+            letter-spacing: 2px;
+            color: #17252a;
+            margin: 0;
+        }
+        /* Elemen ini disembunyikan karena hanya dipakai untuk pemrosesan di balik layar */
+        canvas, video {
+            display: none; 
+        }
+    </style>
+</head>
+<body>
+
+    <h2>ASCII Video Player</h2>
+    <p>Unggah video untuk melihat konversi secara real-time</p>
+
+    <label class="upload-btn">
+        Pilih File Video
+        <input type="file" id="videoInput" accept="video/*">
+    </label>
+
+    <div id="ascii-container">
+        <pre id="ascii-output">Silakan unggah video untuk memulai...</pre>
+    </div>
+
+    <video id="videoElement" controls></video>
+    <canvas id="canvasElement"></canvas>
+
+    <script>
+        const videoInput = document.getElementById('videoInput');
+        const video = document.getElementById('videoElement');
+        const canvas = document.getElementById('canvasElement');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const asciiOutput = document.getElementById('ascii-output');
+
+        // Karakter ASCII dari gelap ke terang
+        const density = " .:-=+*#%@";
+        
+        // Lebar karakter ASCII (semakin kecil semakin detail tapi berat diproses)
+        const asciiWidth = 120; 
+
+        videoInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const fileURL = URL.createObjectURL(file);
+                video.src = fileURL;
+                asciiOutput.innerText = "Memuat video...";
+                video.play();
+            }
+        });
+
+        video.addEventListener('play', function() {
+            // Hitung proporsi video
+            const ratio = video.videoHeight / video.videoWidth;
+            canvas.width = asciiWidth;
+            // Dikalikan 0.5 karena tinggi font monospace di web biasanya 2x lebarnya
+            canvas.height = parseInt(asciiWidth * ratio * 0.5); 
+
+            function drawFrame() {
+                if (video.paused || video.ended) return;
+
+                // Gambar frame video ke canvas
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                // Ambil data piksel dari canvas
+                const frameData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = frameData.data;
+
+                let asciiImage = "";
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+                    
+                    // Hitung tingkat kecerahan rata-rata (Grayscale)
+                    const brightness = (r + g + b) / 3;
+                    
+                    // Petakan kecerahan ke karakter ASCII
+                    const charIndex = Math.floor(brightness / 255 * (density.length - 1));
+                    
+                    // Tambahkan spasi khusus HTML agar format tidak berantakan
+                    const char = density[charIndex] === " " ? "&nbsp;" : density[charIndex];
+                    asciiImage += char;
+
+                    // Buat baris baru setiap mencapai ujung kanan canvas
+                    if ((i / 4 + 1) % canvas.width === 0) {
+                        asciiImage += "<br>";
+                    }
+                }
+
+                // Tampilkan ke layar
+                asciiOutput.innerHTML = asciiImage;
+
+                // Ulangi terus selama video diputar
+                requestAnimationFrame(drawFrame);
+            }
+            
+            drawFrame();
+        });
+    </script>
+</body>
+</html>
