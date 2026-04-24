@@ -120,12 +120,12 @@
 </head>
 <body>
 
-    <h2>KICAU MANIAA YANG VIRAL</h2>
-    <p>Vidio Latar belakang Putih Agar Optimal Yaa</p>
+    <h2>KICAU MANIA</h2>
+    <p>Pembuatan Website, Hubungi Developer 🚀</p>
 
     <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
         <label class="upload-btn">
-            Pilih File Video Cuyy
+            Pilih Video Cuyy
             <input type="file" id="videoInput" accept="video/*">
         </label>
         
@@ -135,11 +135,11 @@
     </div>
 
     <div id="ascii-container">
-        <pre id="ascii-output">DEVELOPER DWI WOII</pre>
+        <pre id="ascii-output">PEMBUATAN WEBSITE, HUBUNGI DEVELOPER</pre>
         <hr style="border: none; border-top: 1px dashed #e0e0e0; margin: 15px 0;">
         
         <div class="developer-credit">
-            Developer <a href="https://dwizy22.my.id" target="_blank">Dwi Woii</a>
+            Developer <a href="https://dwizy22.my.id" target="_blank">Dwi</a>
         </div>
     </div>
 
@@ -154,8 +154,6 @@
         const asciiOutput = document.getElementById('ascii-output');
         const muteBtn = document.getElementById('muteBtn');
 
-        const density = " .:-=+*#%@";
-        
         videoInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -173,6 +171,7 @@
                 };
             }
         });
+
         // Fungsi untuk menghidupkan/mematikan suara
         muteBtn.addEventListener('click', function() {
             if (video.muted) {
@@ -185,14 +184,18 @@
                 muteBtn.style.backgroundColor = '#e74c3c'; // Berubah merah lagi
             }
         });
+
         video.addEventListener('play', function() {
             // Dinamis mengatur lebar resolusi ASCII berdasarkan ukuran layar
-            // Jika buka di HP, detailnya diturunkan sedikit (70) agar lebih ringan dan muat
             const asciiWidth = window.innerWidth < 768 ? 55 : 100; 
             
             const ratio = video.videoHeight / video.videoWidth;
             canvas.width = asciiWidth;
             canvas.height = parseInt(asciiWidth * ratio * 0.5); 
+
+            // Siapkan dua jenis karakter (Gelap dan Terang)
+            const charsDarkBg = " .:-=+*#%@";   
+            const charsLightBg = "@%#*+=-:. "; 
 
             function drawFrame() {
                 if (video.paused || video.ended) return;
@@ -201,6 +204,20 @@
                 const frameData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                 const pixels = frameData.data;
 
+                // --- FITUR AUTO-DETECT WARNA LATAR ---
+                // Cek warna piksel di pojok kiri atas
+                const bgR = pixels[0];
+                const bgG = pixels[1];
+                const bgB = pixels[2];
+                const bgBrightness = (bgR + bgG + bgB) / 3;
+                
+                // Tentukan karakter mana yang dipakai
+                let activeDensity = charsDarkBg;
+                if (bgBrightness > 128) {
+                    activeDensity = charsLightBg; // Balik warna jika background-nya terang!
+                }
+                // -------------------------------------
+
                 let asciiImage = "";
                 for (let i = 0; i < pixels.length; i += 4) {
                     const r = pixels[i];
@@ -208,8 +225,10 @@
                     const b = pixels[i + 2];
                     
                     const brightness = (r + g + b) / 3;
-                    const charIndex = Math.floor(brightness / 255 * (density.length - 1));
-                    const char = density[charIndex] === " " ? "&nbsp;" : density[charIndex];
+                    
+                    // Render menggunakan karakter yang sudah terpilih
+                    const charIndex = Math.floor(brightness / 255 * (activeDensity.length - 1));
+                    const char = activeDensity[charIndex] === " " ? "&nbsp;" : activeDensity[charIndex];
                     asciiImage += char;
 
                     if ((i / 4 + 1) % canvas.width === 0) {
