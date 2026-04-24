@@ -62,9 +62,9 @@
         
         pre {
             font-family: monospace;
-            font-size: 7px;
-            line-height: 7px;
-            letter-spacing: 2px;
+            font-size: 9px;
+            line-height: 9px;
+            letter-spacing: 3px;
             color: #17252a;
             margin: 0 auto;
             /* Penting: Mencegah teks turun ke baris baru yang bisa merusak gambar */
@@ -111,9 +111,9 @@
             }
             pre {
                 /* Proporsi yang lebih seimbang untuk layar HP */
-                font-size: 6px; 
-                line-height: 6px;
-                letter-spacing: 1px;
+                font-size: 7px; 
+                line-height: 7px;
+                letter-spacing: 2px;
             }
         }
     </style>
@@ -187,7 +187,7 @@
 
         video.addEventListener('play', function() {
             // Dinamis mengatur lebar resolusi ASCII berdasarkan ukuran layar
-            const asciiWidth = window.innerWidth < 768 ? 55 : 100; 
+            const asciiWidth = window.innerWidth < 768 ? 60 : 120; 
             
             const ratio = video.videoHeight / video.videoWidth;
             canvas.width = asciiWidth;
