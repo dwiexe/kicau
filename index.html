@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Video to ASCII Converter</title>
+    <title>Kicau Mania</title>
     <style>
         /* Gaya dasar (Desktop) */
         body {
@@ -77,6 +77,20 @@
             display: none; 
         }
 
+        /* Gaya untuk Teks Developer di bawah */
+        .developer-credit {
+            margin-top: 15px;
+            font-size: 13px;
+            color: #7f8c8d;
+            text-align: center;
+            padding-bottom: 10px;
+        }
+        
+        .developer-credit a {
+            color: #3aafa9;
+            text-decoration: none;
+            font-weight: 600;
+        }
         /* Tweak Responsif Khusus HP (Layar di bawah 768px) */
         @media (max-width: 768px) {
             body {
@@ -107,7 +121,7 @@
 <body>
 
     <h2>KICAU MANIAA YANG VIRAL</h2>
-    <p>Unggah video Latar belakang Putih Agar Optimal Yaa</p>
+    <p>Vidio Latar belakang Putih Agar Optimal Yaa</p>
 
     <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
         <label class="upload-btn">
@@ -122,6 +136,11 @@
 
     <div id="ascii-container">
         <pre id="ascii-output">DEVELOPER DWI WOII</pre>
+        <hr style="border: none; border-top: 1px dashed #e0e0e0; margin: 15px 0;">
+        
+        <div class="developer-credit">
+            Developer <a href="https://dwizy22.my.id" target="_blank">Dwi Woii</a>
+        </div>
     </div>
 
     <video id="videoElement" controls muted playsinline loop></video>
